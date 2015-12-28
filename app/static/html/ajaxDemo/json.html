@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../../css/jquery.mobile-1.4.5.min.css">
+    <script src="../../js/jquery-2.1.4.min.js"></script>
+    <script src="../../js/jquery.mobile-1.4.5.min.js"></script>
+    <title></title>
+</head>
+<body>
+<script type="text/javascript">
+    var obj=$.parseJSON('{"name":"json"}');
+    alert(obj.name);
+</script>
+<div id="result">
+    ahha
+</div>
+    <div>
+        <!--一定条件下 在这里进行接受服务器中一个文件更新回来的数据-->
+        <script type="text/javascript">
+            var source=new EventSource("server_sent.php");
+            source.onmessage=function(event){
+                alert('hah');
+                $("#result").innerHTML=event.data + "<br/>";
+            }
+        </script>
+    </div>
+</body>
+</html>

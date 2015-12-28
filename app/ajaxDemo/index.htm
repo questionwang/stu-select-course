@@ -1,0 +1,1170 @@
+
+
+<!-- saved from url=(0022)http://219.150.59.241/ -->
+
+
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd">
+
+<HTML 
+
+xmlns="http://www.w3.org/1999/xhtml"><HEAD><TITLE>中国电信天翼宽带WiFi Portal4.0</TITLE>
+
+<META content="text/html; charset=utf-8" http-equiv=Content-Type>
+
+<META content=IE=7 http-equiv=X-UA-Compatible>
+<script type='text/javascript' src='js/Calendar_zh-min.js'></script>
+<script type='text/javascript' src='js/engine-min.js'></script>
+<script type='text/javascript' src='dwr/interface/DwrHandlerClass.js'></script>
+<script type='text/javascript' src='dwr/util.js'></script>
+
+<SCRIPT language=JavaScript type=text/javascript>
+
+function init()
+{
+	var username = "null";
+	//验证码错误
+	if("null" == "true")
+	{
+		if("null" == "1"){
+			document.getElementById("otherUser").value = username;
+			document.getElementById("validateCode_otherUser").focus();
+		}
+
+		if("null" == "2"){
+			document.getElementById("phone").value = username;
+			document.getElementById("validateCode_phone").focus();
+		}
+		alert("您输入的验证码错误，请重新输入!");
+	}
+
+	if ("null" == "1" )//登录成功
+	{ 
+		clearCookie("loginFailCount"+username);	
+		if("null" == "1") //电信帐号
+		{	
+			document.getElementById("login_box").style.display = 'none';
+			document.getElementById("text_box").style.display = 'none';
+			if("1" == "null") //WiFi时长卡用户
+			{
+				document.getElementById("success_box1").style.display = 'block';
+			}
+			else{
+				document.getElementById("success_box").style.display = 'block';
+			}		
+		}else if("null" == "2") //手机用户
+		{
+			if (username.substr(0,3)!= "189" && username.substr(0,3)!= "153" && username.substr(0,3)!= "133" && username.substr(0,3)!= "180" && username.substr(0,3)!= "181" && sUser.substr(0,3)!= "177" && username.substr(0,3)!= "170" && username.substr(0,3)!= "149")
+			{
+				document.getElementById("otherUserLoginTip").style.display = 'block';
+			}
+			document.getElementById("login_box").style.display = 'none';
+			document.getElementById("text_box").style.display = 'none';
+			document.getElementById("success_box").style.display = 'block';
+			
+			//用cookie记录登录成功次数	
+			var loginOKCount = readCookie("loginOKCount"+username);
+			if( loginOKCount == null ) //当天第一次登录成功，发送提示短信，并设置已提醒Cookie
+			{
+				DwrHandlerClass.sendLoginOKTipSMS(username, null); //调用DWR函数，发送登录成功提示短信
+				writeCookie("loginOKCount"+username, "1", 24*60);		
+			}
+		}
+	}else if ("null" == "0") //登录失败
+	{
+		//检查该帐号登录是否超过三次
+		var loginFailCount = readCookie("loginFailCount"+username);
+		loginFailCount = parseInt((loginFailCount) ? loginFailCount : "0");
+		//alert("loginFailCount: " + loginFailCount);
+		if("null" == "1") //电信帐号
+		{	
+			if(loginFailCount >= 3) //10分钟内失败超过三次
+			{
+				alert("您已连续3次输入密码错误，为了您的帐号安全，请您正确输入验证码继续登录。\n未知原因，如需帮助，请与10000号联系!");
+				var randomIframe = document.getElementById("randomIframe");
+				randomIframe.src = "https://wlan.ct10000.com:443/portal/mobileRandCode.jsp?mobile="+username+"&random=" + Math.random();
+				document.getElementById("validateAreaOhterUserDiv").style.display = 'block';
+				document.getElementById("validateCode_otherUser").value = "";
+				document.getElementById("isNeedValidateCode").value = "true";
+			}else{
+				alert("登录网络失败，以下信息可帮助判断失败原因。\n未知原因，如需帮助，请与10000号联系!" );
+			}
+			document.getElementById("otherUser").value = username;
+			if (username != null && username != "" && username != "null")
+			{
+				document.getElementById("otherUser").value = username;
+				getProvinceCode(); //获取号码归属地
+			}			
+		}else if("null" == "2") //手机用户
+		{
+			if(loginFailCount >= 3) //10分钟内失败超过三次
+			{
+				alert("您已连续3次输入密码错误，为了您的帐号安全，请您正确输入验证码继续登录。\n未知原因，如需帮助，请与10000号联系!");
+				document.getElementById("randImageDiv").style.display = 'block';
+				document.getElementById("divValidateArea").style.display = 'block';
+				document.getElementById("validate2Rand").innerHTML="验证码:";
+				document.getElementById("validateCode_phone").value = "";
+				document.getElementById("isNeedValidateCode").value = "true";
+			}else
+			{
+				alert("登录网络失败，以下信息可帮助判断失败原因。\n未知原因，如需帮助，请与10000号联系!" );
+			}
+			document.getElementById("phone").value = username;
+			if (username != null && username != "" && username != "null")
+			{
+				document.getElementById("phone").value = username;
+			}
+		}
+		//用cookie记录登录失败次数
+		var loginFailCount = readCookie("loginFailCount"+username);
+		loginFailCount = parseInt((loginFailCount) ? loginFailCount : "1") + 1;	
+		writeCookie("loginFailCount"+username, loginFailCount, 5);		
+	}
+}
+
+
+function submitLoginForm(accountType)
+{
+	document.getElementById("loginvalue").value = accountType;
+	var isNeedValidateCode = document.getElementById("isNeedValidateCode").value ;
+	
+	if(accountType == 2){ //手机用户
+		var sUser = document.getElementById("phone").value;
+		var sPassword = document.getElementById("pwd_phone").value;
+		var sValidateCode = document.getElementById("validateCode_phone").value;
+
+
+		if( sUser == '' || sUser.length!=11 || isNaN(sUser) ){
+			alert("手机号错误，请检查后重新输入!");
+			document.getElementById("phone").focus();
+			return false;
+		}	
+
+		if(sPassword == ''){
+			alert("密码不能为空");
+			document.getElementById("pwd_phone").focus();
+			return false;
+		}
+
+		if(isNeedValidateCode == 'true' && sValidateCode == ''){
+			alert("验证码不能为空");
+			document.getElementById("validateCode_phone").focus();
+			return false;
+		}
+
+		//密码过于简单判定
+		if("true" != document.getElementById("isMobileRand").value) //未发送验证码才进行此项检查
+		{
+			var passwordMsg = checkPassword(sUser, sPassword)
+			if(passwordMsg != "OK")
+			{
+					alert("密码过于简单，为了您的帐号安全，建议您立即登录中国电信网上营业厅（www.189.cn）或者拨打10000号修改。已向您手机发送本次登录的随机码，请输入随机码继续本次登录!");
+					var randomIframe = document.getElementById("randomIframe");
+					randomIframe.src = "https://wlan.ct10000.com:443/portal/mobileRandCode.jsp?mobile="+sUser+"&random=" + Math.random();
+					//更改验证码为随机码，并隐藏随机码图片
+					document.getElementById("divValidateArea").style.display = 'block';
+					document.getElementById("randImageDiv").style.display = 'none';
+					document.getElementById("validate2Rand").innerHTML="随机码:";
+					document.getElementById("validateCode_phone").value = "";
+					document.getElementById("isMobileRand").value = "true";
+					document.getElementById("isNeedValidateCode").value = "true";
+					//alert(randomIframe.src);
+					return false;
+			}
+		}
+		
+		if (sUser.substr(0,3)!= "189" && sUser.substr(0,3)!= "153" && sUser.substr(0,3)!= "133" && sUser.substr(0,3)!= "180" && sUser.substr(0,3)!= "181" && sUser.substr(0,3)!= "177" && username.substr(0,3)!= "170" && username.substr(0,3)!= "149")
+		{
+			var sUserName = sUser+"@wlanwz.zx.chntel.com";
+			if (sUserName.length >document.getElementById("longNameLength").value){
+				document.getElementById("postfix").value="@z.zx";
+			}
+			else{
+				document.getElementById("postfix").value="@wlanwz.zx.chntel.com";
+			}
+		}
+		document.getElementById("passwd").value=sPassword;
+	    document.getElementById("username").value=sUser;
+		document.getElementById("validateCode").value=sValidateCode;
+		document.getElementById("loginForm").submit();
+	} else if(accountType == 1) { //电信帐号用户
+		var sUser = document.getElementById("otherUser").value;
+		var sPassword = document.getElementById("otherUserPwd").value;
+		var sAddress = document.getElementById("address1").value;
+		var sValidateCode = document.getElementById("validateCode_otherUser").value;
+
+		
+		if(sUser == ''){
+			alert("帐号不能为空!");
+			document.getElementById("otherUser").focus();
+			return false;
+		}
+
+		if(sPassword == ''){
+
+			alert("密码不能为空!");
+			document.getElementById("otherUserPwd").focus();
+			return false;
+		}
+
+		if(sAddress=="all"){
+			alert("请选择归属地!");
+			document.getElementById("address1").focus();
+			return false;
+		}
+
+		if(isNeedValidateCode == 'true' && sValidateCode == ''){
+			alert("验证码不能为空");
+			document.getElementById("validateCode_otherUser").focus();
+			return false;
+		}
+		
+		//密码过于简单判定		
+		var passwordMsg = checkPassword(sUser, sPassword)
+		if(passwordMsg != "OK")
+		{
+			alert("密码过于简单，为了您的帐号安全，请您立即登录中国电信网上营业厅（www.189.cn）或拨打10000号修改!");
+			var url = "http://bj.189.cn/";
+			window.open(url, "newwindow");
+			return false;
+		}
+
+		//不是11位，或者含有非数字的字符，或者不是1开头，非手机号
+		if (sUser.length != 11 || isNaN(sUser) || sUser.substring(0,1) != "1")
+		{
+			//if(sAddress == "qg") sAddress = "sh";//2011.07.14, 以CH或者W开头的帐号，界面显示“全国”，后缀要求为“sh”
+			document.getElementById("postfix").value="@wlan."+sAddress+".chntel.com";
+		}else
+		{
+			document.getElementById("postfix").value="@cw."+sAddress+".chntel.com";
+		}
+
+		document.getElementById("passwd").value=sPassword;
+	    document.getElementById("username").value=sUser;
+		document.getElementById("address").value=sAddress;	
+		document.getElementById("validateCode").value=sValidateCode;	
+		document.getElementById("loginForm").submit();
+	}
+}
+
+function checkPassword(sUser, sPassword)
+{
+	var retMsg = "OK";
+	//密码过于简单判定
+	if( sUser == sPassword || sPassword.length<6){
+		//alert("sUser == sPassword || sPassword.length<6");
+		return "密码过于简单（密码小于六位或与帐号一致），";
+	}
+
+	var temp="abcdefghigklmnopqrstuvwxyz";
+	if(temp.indexOf(sPassword)>=0){
+		//alert("连续英文字母");
+		return "密码过于简单（密码为连续英文字母），";
+	}
+
+	if (/^(\d)\1+$/.test(sPassword)){
+		//alert("全一样");
+		return "密码过于简单（密码取值一样），";
+	}
+	
+	var str = sPassword.replace(/\d/g, function($0, pos) {
+		return parseInt($0)-pos;
+	});
+	if (/^(\d)\1+$/.test(str)) {
+		//alert("顺增");
+		return "密码过于简单（密码为取值递增数字），";
+	}
+
+	str = sPassword.replace(/\d/g, function($0, pos) {
+		return parseInt($0)+pos;
+	});
+	if (/^(\d)\1+$/.test(str)) {
+		//alert("顺减");
+		return "密码过于简单（密码为取值递减数字），";		
+	}
+
+	if(sUser.indexOf(sPassword)>0){
+		//alert("密码是帐号的截取");
+		return "密码过于简单（密码为帐号的截取），";
+	}
+	return retMsg;
+}
+
+
+function changeAccount(){
+	document.getElementById("address1").disabled = false;
+}
+
+var speed = 1000; //速度   
+var wait = 10; //停留时间
+
+/*
+* 获取临时密码
+*/
+function getPassword()
+{
+	var username = document.getElementById("phone").value;
+	if(username == ""){
+			alert("请输入手机号!");
+			document.getElementById("phone").focus();
+			return false;
+	}
+/**
+	if (username.substr(0,3)!= "189" && username.substr(0,3)!= "153" && username.substr(0,3)!= "133" && username.substr(0,3)!= "180"  && username.substr(0,3)!= "181" && username.substr(0,3)!= "177" && username.substr(0,3)!= "170" && username.substr(0,3)!= "149")
+	{
+		var url = "http://180.166.7.150:8880/index.do?province=bj";
+		window.open(url, "newwindow");
+		return false;
+	}
+	*/
+	DwrHandlerClass.getPassword(username, getPasswordResult);
+
+	disableGetPsw();
+}
+
+function disableGetPsw(){   
+	document.loginForm.getPswBtn.disabled = true;   
+	if(wait == 0){   
+		document.loginForm.getPswBtn.value = "获取密码";   
+		document.loginForm.getPswBtn.disabled = false;
+		wait = 10; 
+	}   
+	else{   
+		document.loginForm.getPswBtn.value = wait+"秒";   
+		wait--;   
+		window.setTimeout("disableGetPsw()",speed);   
+	} 
+}
+
+
+/*
+* 获取临时密码的回调函数
+*/
+function getPasswordResult(ret)
+{
+	ret = "" + ret;
+	//alert("get password result: " + ret)
+	/*
+	* 返回结果为代码，含义如下：
+	*/
+	switch(ret)
+	{
+		case "0":
+			retMsg="尊敬的天翼用户，密码已通过短信发送到您的手机中，如您1分钟内未收到密码，请您重新获取密码，谢谢!";
+			break;
+		case "1":
+			retMsg="尊敬的用户：您输入的号码是空号，请检查号码是否存在，详情请咨询开户地客服热线10000号。";
+			break;
+		case "2":
+			retMsg="尊敬的天翼用户：您的手机已停机，暂不能使用此项业务，详情请咨询开户地客服热线10000号。";
+			break;
+		case "3":
+			retMsg="尊敬的天翼用户：您的手机已停机，暂不能开通此项业务，详情请咨询开户地客服热线10000号。";
+			break;
+		case "4":
+			retMsg="尊敬的用户：您的手机号码办理了天翼宽带套餐业务，套餐密码已通过短信发送到您的手机中,欢迎使用!。";
+			break;
+		case "5":
+		case "6":
+			retMsg="尊敬的用户: 获取密码失败，详细原因请咨询当地客服热线10000号。";
+			break;
+		case "-1":
+			retMsg="尊敬的用户: 获取密码失败，详细原因请咨询当地客服热线10000号。";
+			break;	
+		case "-2":
+			retMsg="尊敬的用户:您还不是中国电信天翼用户，暂不能使用该功能，欢迎您前往中国电信营业厅或拨打10000号办理成为中国电信天翼用户!";
+			break;
+		case "-3":
+			retMsg="尊敬的用户：您输入的号码有错，请您核对您的天翼手机号!";
+			break;	
+		default:
+			retMsg="尊敬的用户: 获取密码失败，详细原因请咨询当地客服热线10000号。";
+	}
+	alert(retMsg);
+}	
+
+	
+
+/*
+* 获取省代码
+*/
+function getProvinceCode()
+{
+	document.getElementById("address1").disabled = false;
+	var sUser = document.getElementById("otherUser").value;
+
+	//2011.07.14, 集团要求CH开头、W开头的帐号，自动选择为“全国”为开户地	
+	if( sUser.search(/^CH\d{9}$/i) > -1 || sUser.search(/^W\d{11}$/i) > -1)
+	{
+		document.getElementById("otherUser").value = sUser.toUpperCase();
+		document.getElementById("address1").value = "sck";
+		document.getElementById("address1").disabled =true;
+		return;
+	}
+
+	//非手机号用户， 直接返回，否则，进行归属地判断
+	if ( sUser.search(/^1\d{10}$/) == -1 )
+	{
+		return;
+	}
+
+	//自动获取省代码
+	DwrHandlerClass.getProvinceCode(sUser, getProvinceCodeResult);
+	return;
+}
+
+
+
+/*
+* 获取省代码的回调函数
+*/
+
+function getProvinceCodeResult(data)
+{
+
+	//alert("get province code result = " + data);
+	if (data != null && data != "" && data != "all")
+	{
+		document.getElementById("address1").value = data;
+		document.getElementById("address1").disabled =true;
+	}else
+	{
+		document.getElementById("address1").disabled =false;
+	}	
+}
+
+
+if ("null" == "1" )
+{
+	//显示上网时间
+	var sec = 0;
+	if("null" != "null")
+	{
+		sec=null;
+	}
+	timeID=setInterval("count()",1000);
+}
+
+function count()
+{
+  sec++;
+  var hours=parseInt(sec/3600);
+  var minutes=parseInt((sec-hours*3600)/60);
+  var seconds=(sec-hours*3600)%60;
+  if (hours<=9) hours="0"+hours
+  if (minutes<=9) minutes="0"+minutes
+  if (seconds<=9) seconds="0"+seconds
+  document.getElementById("num").innerHTML=hours+":"+minutes+":"+seconds;
+  document.getElementById("num1").innerHTML=hours+":"+minutes+":"+seconds;
+}
+
+/*
+* name, value
+* expire: minutes
+*/
+function writeCookie(name, value, expires)
+{
+	// set time, it's in milliseconds
+	var today = new Date();
+	today.setTime( today.getTime() );
+	
+	/*
+	if the expires variable is set, make the correct
+	expires time, the current script below will set
+	it for x number of minutes, to make it for ms:
+	expires * 60 * 1000
+	*/
+	if ( expires ) //minute
+	{
+		expires = expires * 1000 * 60;
+	}
+	var expires_date = new Date( today.getTime() + (expires) );
+	
+	document.cookie = name + "=" + escape( value ) +
+			( ( expires ) ? ";expires=" + expires_date.toGMTString() : "" ) +
+			";path=/";
+}
+
+
+// with this test document.cookie.indexOf( name + "=" );
+function readCookie( check_name ) {
+	// first we'll split this cookie up into name/value pairs
+	// note: document.cookie only returns name=value, not the other components
+	var a_all_cookies = document.cookie.split( ';' );
+	var a_temp_cookie = '';
+	var cookie_name = '';
+	var cookie_value = '';
+	var b_cookie_found = false; // set boolean t/f default f
+
+	for ( i = 0; i < a_all_cookies.length; i++ )
+	{
+		// now we'll split apart each name=value pair
+		a_temp_cookie = a_all_cookies[i].split( '=' );
+		// and trim left/right whitespace while we're at it
+		cookie_name = a_temp_cookie[0].replace(/^\s+|\s+$/g, '');
+		// if the extracted name matches passed check_name
+		if ( cookie_name == check_name )
+		{
+			b_cookie_found = true;
+			// we need to handle case where cookie has no value but exists (no = sign, that is):
+			if ( a_temp_cookie.length > 1 )
+			{
+				cookie_value = unescape( a_temp_cookie[1].replace(/^\s+|\s+$/g, '') );
+			}
+			// note that in cases where cookie is initialized but no value, null is returned
+			return cookie_value;
+			break;
+		}
+		a_temp_cookie = null;
+		cookie_name = '';
+	}
+	if ( !b_cookie_found )
+	{
+		return null;
+	}
+}
+				
+// this deletes the cookie when called
+function clearCookie( name) 
+{
+	if ( readCookie( name ) ) 
+	{
+		document.cookie = name + "=" + 
+			";expires=Thu, 01-Jan-1970 00:00:01 GMT" + 
+			";path=/";
+	}
+}
+
+
+//换验证码
+function reloadImage(id)
+{
+    alert("reload image: " + id);
+	document.getElementById(id).src = "validateCode.jsp?" + Math.random();
+}
+
+</SCRIPT>
+
+<LINK rel=stylesheet type=text/css href="css/style_zh_cn-min.css">
+
+<style type="text/css">
+#ProgressBar {
+		height:12px;
+}
+
+#Pointer {
+	background-image:url('images/1_04.gif');
+	height:12px;
+}
+</style>
+
+<META name=GENERATOR content="MSHTML 8.00.6001.19190"></HEAD>
+<BODY onLoad="init();">
+
+<DIV class=l_wrapper><!-- 顶部 开始 -->
+
+<DIV class=l_header>
+
+<DIV class=head_bg>
+
+<DIV class=head_top>
+
+<DIV class="head_logo fl"><IMG alt=logo 
+
+src="images/logo.gif" width=191 height=58><IMG alt=wifi 
+
+src="images/wifi-logo.gif" width=110 height=49></DIV>
+
+<DIV class=head_ctcl></DIV></DIV>
+
+<DIV class=head_menu_bg>
+
+<DIV class=head_menu>
+
+<UL>
+
+  <LI id=main class="line on"><A 
+
+  href="#" 
+
+  target=_top><SPAN>首页</SPAN></A> </LI>
+
+  <LI class=line><A href="http://wlan.vnet.cn/" 
+
+  target=_blank><SPAN>热点搜索</SPAN></A> </LI>
+
+  <LI class=line><A href="http://bj.189.cn/" 
+
+  target=_blank><SPAN>网上营业厅</SPAN></A> </LI>
+
+  <LI id=faq class=line><A 
+
+  href="faq.htm" 
+
+  target=_top><SPAN>常见问题</SPAN></A> </LI>
+
+  <LI>
+  <A href="http://sh.189.cn/service/workbench/tyt/tytExplain.jsp" target=_blank><SPAN>时长卡购买</SPAN></A> </LI></UL>
+
+<DIV class=head_en><A 
+
+href="en/index.jsp" 
+
+target=_top>English</A></DIV></DIV></DIV></DIV></DIV><!-- 顶部 结束 -->
+
+<!-- 主体 开始 -->
+
+<DIV class="main_bg e_clear">
+
+<DIV class=main_content><!-- 左侧 开始-->
+
+<DIV class=conten_left>
+
+<DIV class=conten_left_l></DIV>
+
+<DIV class=conten_left_c><!-- 登录区 开始 -->
+
+
+
+<DIV class=login_box id=login_box>
+
+<form id="loginForm" name="loginForm" method="post" action="login4V2.do">
+
+	<INPUT id=username  type=hidden name=username>
+
+    <INPUT id=passwd type=hidden name=password>
+	
+	<INPUT id=validateCode type=hidden name=validateCode>
+
+    <INPUT id=postfix type=hidden name=postfix>
+
+    <INPUT id=address type=hidden name=address>
+
+    <INPUT id=loginvalue type=hidden value="null" name=loginvalue>
+
+    <input id=basePath type=hidden value="https://wlan.ct10000.com:443/portal/" name=basePath>
+
+    <input id=language type=hidden value="CN_SC" name=language>
+
+	<INPUT id=longNameLength type=hidden value=32 name=longNameLength>
+
+	<INPUT id=nasType type=hidden name=NasType value="Huawei">
+
+	  <INPUT id=nasName type=hidden name=NasName value="BJ-YQ-SR-1.M.ME60X16">
+
+      <INPUT id=orgURL type=hidden name=OrgURL value="null">
+	  
+	   <INPUT id=isMobileRand  type=hidden name=isMobileRand value="false">
+
+      <INPUT id=isNeedValidateCode  type=hidden name=isNeedValidateCode value="false">
+      
+
+<DIV class=input_box>手机帐号登录 
+
+<TABLE border=0 cellSpacing=0 cellPadding=0>
+
+  <TBODY>
+
+  <TR>
+
+    <TD width="30%" scope=col align="right">手机号:</TD>
+
+    <TD colSpan=2 scope=col><LABEL><INPUT id=phone class=input_text 
+
+      name=phone> </LABEL></TD></TR>
+
+  <TR>
+
+    <TD  align="right">密码:</TD>
+
+    <TD width="41%"><INPUT id=pwd_phone class=input_text type=password name=pwd_phone> </TD>
+
+    <TD width="29%"><INPUT id=getPswBtn class=p_button onClick=getPassword() value=获取密码 type=button> 
+
+    </TD>
+    </TR>
+	<TR>
+		<TD colspan="3" width="100%">
+		<div id="divValidateArea" style="display:none">
+			<TABLE border=0 cellSpacing=0 cellPadding=0 width="100%">
+			  <TBODY>
+				<TR>
+				<TD  width="30%"  align="right"><label id="validate2Rand">验证码:</label></TD>
+				<TD  width="41%"><INPUT id=validateCode_phone class=input_text type=text name=validateCode_phone></TD>
+				<TD  width="29%" align="right">
+					<div id="randImageDiv" style="display:block">
+						<img id="randImage2" src="validateCode.jsp" width="60" height="20" border="1" align="absmiddle" >
+					</div>
+					<iframe name="randomIframe" id="randomIframe" width="0" height="0"></iframe>
+				</TD>
+				</TR>
+			</TBODY>
+			</TABLE>
+		</div>
+		</TD>
+	</TR>
+
+  <TR>
+
+    <TD>&nbsp;</TD>
+
+    <TD colSpan=2><INPUT class=e_button onClick="javascript:submitLoginForm(2);" value=登录 type=button> 
+
+    </TD></TR></TBODY></TABLE></DIV>
+
+<DIV class=input_box>其他帐号登录 
+
+<TABLE border=0 cellSpacing=0 cellPadding=0 width="100%">
+
+  <TBODY>
+
+  <TR>
+
+    <TD width="25%" scope=col  align="right">帐号:</TD>
+
+    <TD width="75%" scope=col><LABEL><INPUT id=otherUser class=input_text 
+
+      name=otherUser onBlur="getProvinceCode()"> </LABEL></TD></TR>
+
+  <TR>
+
+    <TD noWrap  align="right">开户地:</TD>
+
+    <TD><LABEL><SELECT style="TEXT-ALIGN: center; WIDTH: 100px" id=address1 name=address1>
+
+	 			<OPTION value=all>--请选择开户地--</OPTION>
+
+				<OPTION value=zx>全国中心</OPTION>
+				<!--
+				<OPTION value=qg>全国</OPTION>
+			    -->
+				<OPTION value=bj selected>北京</OPTION>
+
+				<OPTION value=tj>天津</OPTION>
+
+				<OPTION value=he>河北</OPTION>
+
+				<OPTION value=sx>山西</OPTION>
+
+				<OPTION value=nm>内蒙古</OPTION>
+
+				<OPTION value=ln>辽宁</OPTION>
+
+				<OPTION value=jl>吉林</OPTION>
+
+				<OPTION value=hl>黑龙江</OPTION>
+
+				<OPTION value=hb>湖北</OPTION>
+
+				<OPTION value=hn>湖南</OPTION>
+
+				<OPTION value=ha>河南</OPTION>
+
+				<OPTION value=js>江苏</OPTION>
+
+				<OPTION value=sd>山东</OPTION>
+
+				<OPTION value=ah>安徽</OPTION>
+
+				<OPTION value=sh>上海</OPTION>
+
+				<OPTION value=zj>浙江</OPTION>
+
+				<OPTION value=fj>福建</OPTION>
+
+				<OPTION value=jx>江西</OPTION>
+
+				<OPTION value=gd>广东</OPTION>
+
+				<OPTION value=hi>海南</OPTION>
+
+				<OPTION value=gx>广西</OPTION>
+
+				<OPTION value=sc>四川</OPTION>
+
+				<OPTION value=cq>重庆</OPTION>
+
+				<OPTION value=gz>贵州</OPTION>
+
+				<OPTION value=yn>云南</OPTION>
+
+				<OPTION value=xz>西藏</OPTION>
+
+				<OPTION value=sn>陕西</OPTION>
+
+				<OPTION value=gs>甘肃</OPTION>
+
+				<OPTION value=qh>青海</OPTION>
+
+				<OPTION value=nx>宁夏</OPTION>
+
+				<OPTION value=xj>新疆</OPTION>
+
+				<OPTION value=am>澳门</OPTION>
+				<OPTION value=sck>时长卡</OPTION>
+				</SELECT> 
+
+      </LABEL></TD></TR>
+
+  <TR>
+
+    <TD  align="right">密码:</TD>
+
+    <TD><LABEL><INPUT id=otherUserPwd class=input_text type=password 
+
+      name=otherUserPwd> </LABEL></TD>
+  </TR>
+  <TR>
+		<TD colspan="3"  width="100%">
+		<div id="validateAreaOhterUserDiv" style="display:none">
+			<TABLE border=0 cellSpacing=0 cellPadding=0  width="100%">
+			  <TBODY>
+				<TR>
+				<TD  width="30%" align="right"><label id="validate2Rand">验证码:</label></TD>
+				<TD  width="41%"><INPUT id=validateCode_otherUser class=input_text type=text name=validateCode_otherUser></TD>
+				<TD  width="29%" align="right">
+					<div>
+						<img id="randImage1" src="validateCode.jsp" width="60" height="20" border="1" align="absmiddle" >
+					</div>
+					
+				</TD>
+				</TR>
+			</TBODY>
+			</TABLE>
+		</div>
+		</TD>
+  </TR>
+  <TR>
+    <TD>&nbsp;</TD>
+
+    <TD><INPUT class=e_button onClick="javascript:submitLoginForm(1);" value=登录 type=button></TD></TR></TBODY></TABLE></DIV>
+	
+	
+<DIV class=seledt_box>
+<SPAN style="Z-INDEX: 10; WIDTH: 280px; MARGIN-LEFT: -1px; FONT-SIZE: 13px">Roaming Visitor Login</SPAN><br>
+<SPAN style="FONT-SIZE: 12px">(国际访客登录)</SPAN>
+
+<SCRIPT language=javascript type=text/javascript>
+
+		function ChangeForm(){
+
+			var oSelect=document.getElementById("select2");
+
+			if (oSelect.selectedIndex == 0) {
+
+				alert(getJSLocale("msg_roamingVisitor"));
+
+				return;
+
+			}
+
+			var optionValue=oSelect.options[oSelect.selectedIndex].value;
+
+			 window.open(optionValue);
+
+			//location.href=optionValue;
+
+			return true;
+
+		}
+
+	</SCRIPT>
+
+ 
+
+<TABLE border=0 cellSpacing=10 width="100%">
+
+  <TBODY>
+
+  <TR>
+
+    <TH width="60%" scope=col align=right><LABEL>
+
+	<SELECT id=select2 name=select2>
+
+	                <OPTION selected>-Select Service Provider-</OPTION>
+
+	  				<option value="./global/roam/alwayson/login.html">alwayson</option>
+
+					<option value="./global/roam/Comfone/login.html">comfone</option>
+
+					<option value="./global/roam/Global Mobile/login.html">Global Mobile</option>
+
+	                <option value="./global/roam/PCCW-HKT mobile service/login.htm">PCCW-HKT mobile service</option>
+
+					<option value="./global/roam/Y5Zone/login.html">Y5Zone</option>
+
+					<option value="./global/roam/Tripletgate/login.htm">Tripletgate</option>
+
+					<option value="./global/roam/StarHub/login.htm">StarHub</option>
+
+					<option value="./global/roam/CTM/login.html">澳門電訊</option>
+
+					<option value="./global/roam/CHT_new/login.html">中華電信</option>
+
+					<option value="./global/roam/FET/login.html">安源通訊</option>
+
+					<option value="./global/roam/Wi2/login.html">Wi2(Wire&Wireless)</option>
+
+					<option value="./global/roam/GlobeTelecom/login.html">Globe</option>
+
+					<option value="./global/roam/IndosatM2/login.html">IndosatM2</option>
+
+					<option value="./global/roam/NTT/login.html">NTTcom</option>
+
+					<option value="./global/roam/kt/login.html">Korea Telecom</option>
+
+					<option value="./global/roam/True/login.html">True</option>
+
+					<option value="./global/roam/Trustive/login.html">Trustive</option>
+
+					<option value="./global/roam/freedom4/login.html">Freedom4</option>
+
+					<option value="./global/roam/att/login.html">AT&T(美国电信)</option>
+
+					<option value="./global/roam/boingo_new/login.html">BOINGO</option>
+
+					<option value="./global/roam/ipass-chinanet/login_cn.html">ipass-chinanet</option>
+
+					<option value="./global/roam/Tomizone/login.html">Tomizone</option>
+
+					<option value="./global/roam/Orange/home.html">Orange</option>
+					
+					<option value="./global/roam/FarEasTone/login.html">FarEasTone</option>
+
+					</SELECT> 
+
+      </LABEL></TH>
+
+    <TH width="40%" scope=col align=left><INPUT id=button class=go onClick="return ChangeForm()" type=button name=button> 
+
+      <LABEL></LABEL></TH></TR></TBODY></TABLE></DIV>
+</form>
+</DIV>
+<!-- 登录区 结束 --><!-- 文字介绍区 开始 -->
+
+<DIV class=text_box id="text_box"><div style="margin-top:-20px;"><SPAN class=r_font>目前中国电信为用户提供以下几种帐号类型:</SPAN></div>
+
+<UL><SPAN>1、手机帐号</SPAN><BR>
+
+  <LI>中国电信天翼手机号码； </LI>
+<!--  
+  <LI>中国移动、中国联通手机号码； </LI>
+ --> 
+
+  <LI>可通过点击“获取密码”按钮将WiFi上网密码以短信形式发送至用户手机。 </LI></UL>
+
+<UL><SPAN>2、其他帐号</SPAN><BR>
+
+  <LI>宽带帐号：中国电信天翼宽带套餐、E8/E9套餐等用户可通过访问开户的的网上营业厅或致电10000号查询您的宽带帐号与密码；</LI>
+
+  <LI>WiFi时长卡帐号：中国电信提供的按使用时间为计费标准的Internet网络服务产品，帐号格式为“W+11位数字”或“CH+9位数字”。</LI></UL>
+
+<TABLE border=0 cellSpacing=0 cellPadding=5 height="40">
+  <TBODY>
+  <TR>
+      <td width="30%"><DIV class=hui_font>WiFi时长卡</DIV></td>
+	  <td><INPUT class=g_button onClick="javascript:window.open('http://sh.189.cn/service/workbench/tyt/tytExplain.jsp');" value=在线购买 type=button></td>
+  </TR>
+	<tr><td colspan="2">
+	<!-- 
+	<INPUT class=f_button onClick="javascript:window.open('http://180.166.7.150:8880/index.do?province=bj');" type=button>
+	 -->
+	</td></tr>
+	</TBODY></TABLE></DIV><!-- 文字介绍区 结束 -->
+
+	<!-- 手机用户登录成功 开始 -->
+
+	<div id=success_box class="text_box4" style="display:none">
+
+	<span style="font-size:18px;font-family:'黑体';color:#010101;">登录成功</span><br><br>
+
+	<span style="font-size:14px; font-family:'宋体'; color:#000000">欢迎使用中国电信天翼宽带WiFi网络</span><br><br>
+
+	<div id=otherUserLoginTip style="font-size:14px; font-family:'宋体';color:#000000;height:30px; vertical-align:middle; display:none;">如您成为天翼手机用户，您将享受更多的优质服务!</div>
+
+	<span style="font-size:14px; font-family:'宋体'; color:#000000">您本次上网时间：</span><span id="num" class="time">00:00:00</span><br><br>
+
+	<img src="images/tip.jpg" width="21" height="21"><span style="font-size:16px;font-family:'黑体';color: #fd9427;">如需上网，请您重新打开一个浏览器窗口<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;在您上网期间，请保留本页面。</span><br><br>
+
+	<table width="330" border="0" align="center">
+
+					<tr>
+
+						<td width="50%" valign="top">
+
+						<div align="right">
+
+	
+
+							<a href="Logout.do?NasType=Huawei&NasName=BJ-YQ-SR-1.M.ME60X16" 
+
+							onclick="return confirm('您确定要断开本次天翼无线宽带网络吗?')" 
+
+							><img src="images/logout.jpg" width="94" height="26" border="0"></a>
+
+						</div>
+
+						</td>
+
+						<td>
+
+						<div class="STYLE18" style="width:176px;height:46px;BACKGROUND-IMAGE:url(images/logout_tip.jpg); text-align:center;" id="duankai_ts">点击“断开网络”按钮后，<br />您将退出本次WiFi网络登录
+
+						</div>
+
+						</td>
+
+					</tr>
+
+				</table>
+
+	</div>
+
+	<!-- 手机用户登录成功 结束 -->
+
+	<!-- 计时卡用户登录成功 开始 -->
+
+		<div id=success_box1 class="text_box4" style="display:none">
+
+	<span style="font-size:18px;font-family:'黑体';color:#010101;">登录成功</span><br><br>
+
+	<span style="font-size:14px; font-family:'宋体'; color:#000000">欢迎使用中国电信天翼宽带WiFi网络</span><br><br>
+
+	<span style="font-size:14px; font-family:'宋体'; color:#000000">您本次上网时间：</span><span id="num1" class="time">00:00:00</span><br><br>
+
+	<strong style="font-size:14px; font-family:'宋体'; color:#000000">剩余时间：</strong> <div id="Lable"><script>ShowDateNew3(null);</script></div>
+
+	<table width="270">
+
+								<tr>
+
+									<td width="270px" style="background-image: url('images/2_08.gif');padding: 0 0 0 0" height="12px">
+
+										<div id="ProgressBar" >
+
+				           	 			<div id="Pointer" style="width:100%"></div>
+
+									</div>
+
+							</td></tr>
+
+							</table><br>
+
+							<table width="330" border="0">
+
+				  <tr>
+
+					<td width="10%" valign="top">
+
+	<img src="images/tip.jpg" width="21" height="21"></td>
+
+					<td><span style="font-size:16px;font-family:'黑体';color: #fd9427;">如需上网，请您重新打开一个浏览器窗口<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;在您上网期间，请保留本页面。</span></td>
+
+				  </tr>
+
+				</table><br>
+
+	<table width="330" border="0" align="center">
+
+					<tr>
+
+						<td width="50%" valign="top">
+
+						<div align="right">
+
+	
+
+							<a href="Logout.do?NasType=Huawei&NasName=BJ-YQ-SR-1.M.ME60X16" 
+
+							onclick="return confirm('您确定要断开本次天翼无线宽带网络吗?')" 
+
+							><img src="images/logout.jpg" width="94" height="26" border="0"></a>
+
+						</div>
+
+						</td>
+
+						<td>
+
+						<div style="width:176px;height:46px;BACKGROUND-IMAGE:url(images/logout_tip.jpg); text-align:center;font-size:12px;font-family:'宋体';color: #0368fe;" id="duankai_ts">点击“断开网络”按钮后，<br />您将退出本次WiFi网络登录
+
+						</div>
+
+						</td>
+
+					</tr>
+
+				</table>
+
+	</div>
+
+	<!-- 计时卡用户登录成功 结束 -->
+
+	</DIV>
+
+<DIV class=conten_left_r></DIV></DIV><!-- 左侧 结束 --><!-- 右侧 开始 -->
+
+<DIV class=conten_right>
+
+<TABLE border=0 cellSpacing=0 cellPadding=0 width=231>
+
+  <TBODY>
+
+  <TR>
+
+    <TH scope=col><IMG src="images/download_01.jpg" 
+
+      width=231 height=100></TH></TR>
+
+  <TR>
+
+    <TD><IMG src="images/download_02.jpg" width=231 
+
+      height=90></TD></TR>
+
+  <TR>
+
+    <TD><IMG src="images/download_03.jpg"  usemap="#Map" width=231 
+
+      height=79>
+      <MAP id=Map name=Map><AREA 
+
+  href="http://esurfingdownload.tykd.vnet.cn/EServices/download.html" shape=rect target=_blank 
+
+  coords=33,1,205,79></MAP>
+      </TD></TR>
+
+  <TR>
+
+    <TD><IMG src="images/download_04.jpg"  usemap="#Map2" width=231 
+
+      height=147>
+      <MAP id=Map2 name=Map2><AREA 
+
+  href="http://bj.189.cn/hykd/?intid=bj-home-banner05" shape=rect target=_blank 
+
+  coords=33,1,205,79></MAP>
+      </TD></TR>
+</TBODY></TABLE></DIV><!-- 右侧 结束 -->
+  </DIV></DIV><!-- 主体 结束 --><!-- 底部 开始 -->
+
+<DIV><!-- SSO START --><!-- SSO END -->
+
+<DIV class=foot_box><IMG alt=10000 
+
+src="images/10000.gif" width=149 height=21>
+
+<DIV 
+
+class=foot_text>版权所有(C)中国电信集团公司</DIV></DIV></DIV><!-- 底部 结束 --></DIV>
+
+<script language = "javascript">
+//window.open('dxnotice_new.htm','HXTK_NewW','toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, status=no, titlebar=no, top=30, left=160, width=450, height=200')
+//window.open('dxnotice1.htm','HXTK_NewW','toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, status=no, titlebar=no, top=30, left=160, width=350, height=500')
+</script>
+
+</BODY></HTML>
+
+
+

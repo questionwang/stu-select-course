@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>me</title>
+    <link rel="stylesheet" href="../css/jquery.mobile-1.4.5.css">
+    <script style="text/javascript" src="../js/jquery-2.1.4.min.js"></script>
+    <script style="text/javascript" src="../js/jquery.mobile-1.4.5.min.js"></script>
+</head>
+<style type="text/css">
+    .con{
+        display: none;
+    }
+</style>
+<body>
+<!--此试例验证了可以通过设置属性调控显示-->
+<div data-role="page">
+    <div data-role="header">
+
+        <ul>
+            <li onclick="hea(1)" >a</li>
+            <li onclick="hea(2)">b</li>
+            <li onclick="hea(3)">c</li>
+        </ul>
+
+        <script style="text/javascript">
+            function hea(num){
+                var c1=document.getElementById('content1');
+                var c2=document.getElementById('content2');
+                var c3=document.getElementById('content3');
+                if(num==1){
+                    c1.style.display='block';
+                    c2.style.display='none';
+                    c3.style.display='none';
+                }else if(num==2){
+                    c1.style.display='none';
+                    c2.style.display='block';
+                    c3.style.display='none';
+                }else if(num==3){
+                    c1.style.display='none';
+                    c2.style.display='none';
+                    c3.style.display='block';
+                }
+            }
+        </script>
+    </div>
+    <div data-role="content" id="content1" class="con">
+        <div class="ui-field-contain" style="margin: 100px 30%;" >
+            <h>content1</h>
+        </div>
+    </div>
+    <div data-role="content" id="content2" class="con">
+        <div class="ui-field-contain" style="margin: 100px 30%;" >
+           <h>content2</h>
+        </div>
+    </div>
+    <div data-role="content" id="content3" class="con">
+        <div class="ui-field-contain" style="margin: 100px 30%;" >
+            <h>content3</h>
+        </div>
+    </div>
+    <div data-role="footer" data-position="fixed">
+        <ul>
+            <li>f1</li>
+            <li>f2</li>
+            <li>f3</li>
+        </ul>
+    </div>
+</div>
+</body>
+</html>

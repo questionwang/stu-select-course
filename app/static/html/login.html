@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>学生登陆</title>
+    <link rel="stylesheet" href="../css/jquery.mobile-1.4.5.css">
+    <script style="text/javascript" src="../js/jquery-2.1.4.min.js"></script>
+    <script style="text/javascript" src="../js/jquery.mobile-1.4.5.min.js"></script>
+</head>
+<body>
+    <div data-role="page">
+        <div data-role="content">
+            <div class="ui-field-contain" style="margin: 100px 30%;" >
+                <form action="http://www.debugcode.cn/mydemo/inlogin.php" method="post" >
+                        <label for="name">用户名</label>
+                        <input type="text" id="name"  class="in" name="name" placeholder="your name" />
+                        <label for="pass">密码</label>
+                        <input type="password" id="pass" class="in" name="pass" placeholder="you pass" />
+                        <input type="submit" value="登陆" id="login">
+                </form>
+                <input type="reset" value="重置信息" >
+                <input onclick="bk()" type="button" value="返回"/>
+                <script type="text/javascript">
+                function bk(){
+                    window.history.back();
+                }
+            </script>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
